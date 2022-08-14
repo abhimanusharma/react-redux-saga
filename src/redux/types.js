@@ -7,4 +7,9 @@ const USER = {
   REMOVE_USER: "REMOVE_USER"
 };
 
-export { USER };
+const POST = {
+  POSTS: "POSTS",
+  GET_POSTS: "GET_POSTS"
+};
+
+export { USER, POST };
