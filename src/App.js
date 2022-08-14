@@ -1,17 +1,17 @@
 import React, { useEffect } from "react";
-import { AddUser, RemoveUser } from "./redux/action";
+import { AddUser, RemoveUser, GetUsers } from "./redux/userAction";
 import { useDispatch, useSelector } from "react-redux";
 import { v4 } from "uuid";
 
 const App = () => {
   const [userName, setUserName] = React.useState();
-  const [userAge, setUserAge] = React.useState();
+  const [userCity, setUserCity] = React.useState();
   const [messages, setMessages] = React.useState([]);
   const dispatch = useDispatch();
   const userStore = useSelector((state) => state?.userReducer);
   let users = userStore?.users?.sort((a, b) => b.id - a.id);
   const handleUpdateUser = () => {
-    if (!userName || !userAge) {
+    if (!userName || !userCity) {
       if (!userName) {
         let message = {
           type: "Error",
@@ -20,12 +20,21 @@ const App = () => {
         let msgs = [...messages, message];
         setMessages(msgs);
       }
+      if (!userCity) {
+        let message = {
+          type: "Error",
+          Errors: ["CIty is required"]
+        };
+        let msgs = [...messages, message];
+        setMessages(msgs);
+      }
     } else {
-      // let lastId = users?.[0]?.id || 0;
       const userData = {
         id: v4(),
         name: userName,
-        age: userAge
+        address: {
+          city: userCity
+        }
       };
       dispatch(AddUser(userData));
     }
@@ -33,21 +42,22 @@ const App = () => {
   const handleChangeUserName = (e) => {
     setUserName(e.target.value);
   };
-  const handleChangeUserAge = (e) => {
-    setUserAge(e.target.value);
+  const handleChangeUserCity = (e) => {
+    setUserCity(e.target.value);
   };
   const handleRemove = (user) => {
     const isConfirm = window.confirm("Are you sure?");
     if (isConfirm) {
-      //console.log(user);
       dispatch(RemoveUser(user));
     }
   };
 
   useEffect(() => {
+    dispatch(GetUsers());
+  }, []);
+  useEffect(() => {
     setUserName(null);
-    setUserAge(null);
-    console.log(users);
+    setUserCity(null);
   }, [users]);
 
   return (
@@ -69,8 +79,8 @@ const App = () => {
           placeholder="Enter age"
           type="number"
           name="age"
-          value={userAge || ""}
-          onChange={(e) => handleChangeUserAge(e)}
+          value={userCity || ""}
+          onChange={(e) => handleChangeUserCity(e)}
           required
           className="bg-slate-100 p-2 mr-2"
         />
@@ -85,7 +95,7 @@ const App = () => {
         <ul type="none" className="max-w-fit mx-auto">
           {users.map((u, i) => (
             <li key={i} className="flex mb-2">
-              <strong className="mr-1">{u.name}: </strong> {u.age}{" "}
+              <strong className="mr-1">{u.name}: </strong> {u.address?.city}{" "}
               <h5
                 className="border rounded px-1 cursor-pointer ml-4"
                 onClick={() => handleRemove(u)}

@@ -12,3 +12,8 @@ export const RemoveUser = (user) => {
     payload: user
   };
 };
+export const GetUsers = () => {
+  return {
+    type: USER.USERS
+  };
+};
